@@ -1,0 +1,24 @@
+{
+  "name": "cfllm",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "register-commands": "node scripts/register-commands.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@cloudflare/ai": "^1.2.2",
+    "discord-interactions": "^3.4.0",
+    "hono": "^4.9.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250913.0",
+    "@types/node": "^24.3.3",
+    "dotenv": "^17.2.2",
+    "undici": "^7.16.0",
+    "wrangler": "^4.36.0"
+  },
+  "type": "module"
+}
