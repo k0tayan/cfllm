@@ -13,3 +13,7 @@ routes = [
 
 [ai]
 binding = "AI"
+
+[vars]
+# Default provider can be overridden per environment
+LLM_PROVIDER = "gemini"
