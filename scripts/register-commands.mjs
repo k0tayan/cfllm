@@ -11,19 +11,8 @@ if (!token || !applicationId) {
 
 const url = `https://discord.com/api/v10/applications/${applicationId}/commands`;
 
+// Primary command focuses on crime coefficient measurement
 const commands = [
-  {
-    name: 'ask',
-    description: 'Ask a question to the LLM.',
-    options: [
-      {
-        name: 'prompt',
-        description: 'The question you want to ask.',
-        type: 3, // STRING
-        required: true,
-      },
-    ],
-  },
   {
     name: 'dominate',
     description: '指定したユーザーの犯罪係数を測定します',

@@ -20,7 +20,7 @@
 
 ### Discordスラッシュコマンド経由
 
-1.  ユーザーがDiscordクライアントでスラッシュコマンド (`/ask`) を実行します。
+1.  ユーザーがDiscordクライアントでスラッシュコマンド（`/dominate`）を実行します。
 2.  Discordは、Workerの `POST /api/interactions` エンドポイントにリクエストを送信します。
 3.  このリクエストには、コマンドを実行したユーザーの情報（ユーザーID、サーバー情報など）が含まれています。
 4.  Workerは、リクエストヘッダーに含まれる署名とタイムスタンプを使い、**Discordの公開鍵**でリクエストが正当なものであるかを検証します。
@@ -38,19 +38,17 @@
 
 ## 5. データフロー 🌊
 
-### DiscordからのLLMタスク実行フロー
+### DiscordからのLLMタスク実行フロー（犯罪係数測定）
 
-1.  **Discord User**: `/ask` コマンドを実行。
-2.  **Discord API**: Workerの `POST /api/interactions` エンドポイントにリクエストを送信。
+1.  **Discord User**: `/dominate user:@target` コマンドを実行。
+2.  **Discord API**: Worker の `POST /api/interactions` にリクエストを送信。
 3.  **Worker**:
     a. 署名検証を行い、リクエストの正当性を確認。
-    b. リクエストボディからプロンプトを取得。
-    c. Discord APIに対し「考え中...」という応答 (`DEFERRED`) を即座に返す。
-    d. バックグラウンドでLLM実行関数 (`executeLlmTask`) を呼び出す。
-    e. Cloudflare Workers AIにプロンプトを送信。
-    f. LLMからの応答を受け取る。
-    g. DiscordのWebhook APIを使い、元のメッセージをLLMの応答結果で更新する。
-4.  **Discord User**: Botのメッセージが更新され、結果が表示される。
+    b. 対象ユーザー ID を取得し、チャンネル内の直近メッセージ（最大50件）から該当ユーザーの最新メッセージを選定。
+    c. Discord へ `DEFERRED` を返し、バックグラウンドで LLM 実行関数（`analyzeCrimeCoefficient`）を呼び出す。
+    d. Cloudflare Workers AI にメッセージ内容を渡して解析し、構造化 JSON を取得。
+    e. 犯罪係数から「執行モード」を判定し、Webhook で元メッセージを更新。
+4.  **Discord User**: 測定結果が表示される。
 
 ***
 

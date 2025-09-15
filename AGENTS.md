@@ -5,7 +5,7 @@
   - `index.ts` (Hono app, routes, Discord interactions)
   - `verify.ts` (Discord signature verification)
   - `llm.ts` (Workers AI invocation)
-- `scripts/` — One‑off utilities: `register-commands.mjs` (registers `/ask`).
+- `scripts/` — One‑off utilities: `register-commands.mjs` (registers `/dominate`).
 - `doc/` — Deployment and system design docs.
 - `wrangler.toml` — Worker entrypoint, routes, and bindings.
 - `.env`, `.dev.vars` — Local development variables (do not commit secrets).
@@ -13,7 +13,7 @@
 ## Build, Test, and Development Commands
 - `npm run dev` — Start local dev server with Wrangler (`/` health check, `/api/interactions`).
 - `npm run deploy` — Deploy to Cloudflare Workers (uses `wrangler.toml`; minified).
-- `npm run register-commands` — Register the Discord `/ask` command (needs `.env`).
+- `npm run register-commands` — Register the Discord `/dominate` command (needs `.env`).
 - Secrets (once per env):
   - `npx wrangler secret put DISCORD_PUBLIC_KEY|DISCORD_BOT_TOKEN|DISCORD_APPLICATION_ID`
 
@@ -27,7 +27,7 @@
 ## Testing Guidelines
 - No formal test runner is configured yet.
 - Validate changes via `npm run dev` and manual requests:
-  - Verify PING flow and `/ask` deferred update path.
+  - Verify PING flow and `/dominate` deferred update path.
 - If adding tests, prefer Vitest + `@cloudflare/workers-types`; place under `tests/` with `*.test.ts`.
 
 ## Commit & Pull Request Guidelines
