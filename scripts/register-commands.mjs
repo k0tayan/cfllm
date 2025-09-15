@@ -37,6 +37,14 @@ const commands = [
       },
     ],
   },
+  {
+    name: 'register',
+    description: 'このサーバーをボットの許可リストに登録します（管理者のみ）',
+  },
+  {
+    name: 'unregister',
+    description: 'このサーバーをボットの許可リストから解除します（管理者のみ）',
+  },
 ];
 
 for (const command of commands) {
