@@ -1,11 +1,9 @@
 import { Hono } from 'hono';
 import { verifyDiscordRequest } from './verify';
-import { Ai } from '@cloudflare/ai';
-import { executeLlmTask } from './llm';
+import { executeLlmTask, analyzeCrimeCoefficient } from './llm';
 
 // Types for bindings from wrangler.toml
 type Bindings = {
-  AI: Ai;
   DISCORD_PUBLIC_KEY: string;
   DISCORD_APPLICATION_ID: string;
   DISCORD_BOT_TOKEN: string;
@@ -47,6 +45,11 @@ app.post('/api/interactions', async (c) => {
     return c.json({ type: 5 }); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
   }
 
+  if (interaction.type === 2 && interaction.data.name === 'dominate') {
+    c.executionCtx.waitUntil(handleDominateCommand(c, interaction));
+    return c.json({ type: 5 }); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+  }
+
   console.error('Unhandled interaction type:', interaction.type);
   return c.text('Unhandled interaction type', 400);
 });
@@ -57,11 +60,14 @@ async function handleAskCommand(c: any, interaction: any) {
   try {
     const prompt = interaction.data.options.find((opt: any) => opt.name === 'prompt')?.value;
     const response = await executeLlmTask(c.env.AI, prompt);
+    const text = typeof response === 'string'
+      ? response
+      : (response?.response ?? response?.output_text ?? '');
 
     return await fetch(followupUrl, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: response.response || 'Sorry, I could not generate a response.' }),
+      body: JSON.stringify({ content: text || 'Sorry, I could not generate a response.' }),
     });
   } catch (error: any) {
     console.error('Error handling /ask command:', error);
@@ -74,3 +80,76 @@ async function handleAskCommand(c: any, interaction: any) {
 }
 
 export default app;
+
+async function handleDominateCommand(c: any, interaction: any) {
+  const followupUrl = `https://discord.com/api/v10/webhooks/${c.env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`;
+  try {
+    const userOpt = interaction.data.options?.find((opt: any) => opt.name === 'user');
+    const targetUserId: string | undefined = userOpt?.value;
+    if (!targetUserId) {
+      return await fetch(followupUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: 'ユーザー指定が無効です。' }),
+      });
+    }
+
+    const username: string =
+      interaction.data.resolved?.users?.[targetUserId]?.username || `<@${targetUserId}>`;
+    const channelId: string = interaction.channel_id;
+
+    // Fetch last 50 messages and pick the latest by the target user
+    const listUrl = `https://discord.com/api/v10/channels/${channelId}/messages?limit=50`;
+    const listRes = await fetch(listUrl, {
+      headers: { Authorization: `Bot ${c.env.DISCORD_BOT_TOKEN}` },
+    });
+
+    if (!listRes.ok) {
+      const msg = listRes.status === 403 || listRes.status === 401
+        ? 'メッセージを取得できませんでした（権限/設定を確認してください）。'
+        : `メッセージ取得に失敗しました。（${listRes.status}）`;
+      return await fetch(followupUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: msg }),
+      });
+    }
+
+    const messages = (await listRes.json()) as Array<any>;
+    const latest = messages.find((m) => m?.author?.id === targetUserId && typeof m?.content === 'string');
+
+    if (!latest) {
+      return await fetch(followupUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: '対象ユーザーの直近メッセージが見つかりませんでした。' }),
+      });
+    }
+
+    const result = await analyzeCrimeCoefficient(c.env.AI, latest.content);
+    const executionMode = getExecutionMode(result.crime_coefficient);
+
+    const content = `**犯罪係数測定結果**\n\n対象ユーザー: ${username}\n犯罪係数: ${result.crime_coefficient}\n執行モード: ${executionMode}\n\n**判定理由**\n${result.reason}`;
+
+    return await fetch(followupUrl, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    });
+  } catch (error: any) {
+    console.error('Error handling /dominate command:', error);
+    return await fetch(followupUrl, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: `エラーが発生しました: ${error?.message ?? 'unknown error'}` }),
+    });
+  }
+}
+
+function getExecutionMode(cc: number): string {
+  if (cc > 300) return 'Lethal Eliminator';
+  if (cc >= 100 && cc <= 299) return 'Non-Lethal Paralyzer';
+  if (cc > 0 && cc < 100) return '執行対象外';
+  if (cc === 0) return '執行対象外(免罪体質者)';
+  return '不明';
+}

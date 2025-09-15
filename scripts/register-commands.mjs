@@ -11,35 +11,49 @@ if (!token || !applicationId) {
 
 const url = `https://discord.com/api/v10/applications/${applicationId}/commands`;
 
-const command = {
-  name: 'ask',
-  description: 'Ask a question to the LLM.',
-  options: [
-    {
-      name: 'prompt',
-      description: 'The question you want to ask.',
-      type: 3, // STRING
-      required: true,
-    },
-  ],
-};
-
-const response = await fetch(url, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bot ${token}`,
+const commands = [
+  {
+    name: 'ask',
+    description: 'Ask a question to the LLM.',
+    options: [
+      {
+        name: 'prompt',
+        description: 'The question you want to ask.',
+        type: 3, // STRING
+        required: true,
+      },
+    ],
   },
-  body: JSON.stringify(command),
-});
+  {
+    name: 'dominate',
+    description: '指定したユーザーの犯罪係数を測定します',
+    options: [
+      {
+        name: 'user',
+        description: '測定対象のユーザー',
+        type: 6, // USER
+        required: true,
+      },
+    ],
+  },
+];
 
-if (response.ok) {
-  console.log('Successfully registered /ask command.');
-  const data = await response.json();
-  console.log(JSON.stringify(data, null, 2));
-} else {
-  console.error('Failed to register /ask command.');
-  const error = await response.text();
-  console.error(error);
-  process.exit(1);
+for (const command of commands) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bot ${token}`,
+    },
+    body: JSON.stringify(command),
+  });
+
+  if (response.ok) {
+    console.log(`Successfully registered /${command.name} command.`);
+  } else {
+    console.error(`Failed to register /${command.name} command.`);
+    const error = await response.text();
+    console.error(error);
+    process.exit(1);
+  }
 }
