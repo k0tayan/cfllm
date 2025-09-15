@@ -25,6 +25,18 @@ const commands = [
       },
     ],
   },
+  {
+    name: 'dominate_with_message_url',
+    description: 'メッセージURLから本文を取得して犯罪係数を測定します',
+    options: [
+      {
+        name: 'url',
+        description: 'DiscordメッセージのURL',
+        type: 3, // STRING
+        required: true,
+      },
+    ],
+  },
 ];
 
 for (const command of commands) {
