@@ -184,7 +184,7 @@ else:
 - 既存の Workers AI 呼び出しユーティリティを流用。JSON 解析とフォールバックを内包。
 
 ### scripts/register-commands.mjs（登録スクリプト）
-- 既存 `/ask` に加え `/dominate` を登録する配列へ追加。
+- `/dominate` コマンドを登録対象として設定。
 - 実行: `npm run register-commands`（`.env` 必要）。
 
 ### wrangler.toml / 環境変数
