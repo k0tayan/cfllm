@@ -9,7 +9,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@cloudflare/ai": "^1.2.2",
     "discord-interactions": "^3.4.0",
     "hono": "^4.9.7"
   },
