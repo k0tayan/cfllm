@@ -1,7 +1,7 @@
 import { Context } from 'hono';
 
 import { analyzeCrimeCoefficient } from './llm';
-import { ALLOWED_GUILD_IDs } from './config';
+import { isGuildAllowed } from './guilds';
 import { getExecutionMode, parseDiscordMessageUrl } from './utils';
 import type { Bindings } from './bindings';
 
@@ -110,7 +110,8 @@ export async function handleDominateWithMessageUrl(c: Context<{ Bindings: Bindin
       });
     }
 
-    if (!ALLOWED_GUILD_IDs.includes(guildId)) {
+    const allowed = await isGuildAllowed(c.env, guildId);
+    if (!allowed) {
       return await fetch(followupUrl, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
