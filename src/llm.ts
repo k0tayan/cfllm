@@ -1,21 +1,5 @@
 import { Ai } from "@cloudflare/workers-types/experimental";
 
-export async function executeLlmTask(ai: any, prompt: string): Promise<any> {
-  if (!prompt) {
-    throw new Error('Prompt is missing.');
-  }
-
-  try {
-    const response = await ai.run('@cf/meta/llama-3.1-8b-instruct', {
-      prompt,
-    });
-    return response;
-  } catch (error) {
-    console.error('Error executing LLM task:', error);
-    throw new Error('An internal error occurred while executing the LLM task.');
-  }
-}
-
 export type CrimeResult = {
   crime_coefficient: number;
   reason: string;
