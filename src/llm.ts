@@ -51,9 +51,8 @@ export async function analyzeCrimeCoefficient(ai: any, userMessage: string): Pro
       const text = extractAiText(res);
       const parsed = safeParseJson(text);
       if (parsed) {
-        const cc = clampCoefficient(parsed.crime_coefficient);
         const reason = String(parsed.reason ?? '').trim() || '理由の抽出に失敗しました。';
-        return { crime_coefficient: cc, reason };
+        return { crime_coefficient: parsed.crime_coefficient, reason };
       }
     } catch (e) {
       console.error('analyzeCrimeCoefficient attempt failed:', e);
@@ -90,13 +89,6 @@ function isCrimeResult(obj: any): obj is CrimeResult {
     (typeof obj.crime_coefficient === 'number' || typeof obj.crime_coefficient === 'string') &&
     (typeof obj.reason === 'string' || typeof obj.reason === 'number')
   );
-}
-
-function clampCoefficient(value: number | string): number {
-  const n = Math.round(Number(value));
-  if (!Number.isFinite(n) || n < 0) return 0;
-  // 999 以上を出さない制約を考慮して上限は 998 とする
-  return Math.min(n, 998);
 }
 
 function extractAiText(res: any): string {
