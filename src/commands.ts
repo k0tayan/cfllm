@@ -53,7 +53,7 @@ export async function handleDominateCommand(c: Context<{ Bindings: Bindings }>, 
       });
     }
 
-    const result = await analyzeCrimeCoefficient(c.env.AI, latest.content);
+    const result = await analyzeCrimeCoefficient(c.env, latest.content);
     const executionMode = getExecutionMode(result.crime_coefficient);
 
     const content = `**犯罪係数測定結果**\n\n対象ユーザー: ${username}\n犯罪係数: ${result.crime_coefficient}\n執行モード: ${executionMode}\n\n**判定理由**\n${result.reason}`;
@@ -147,7 +147,7 @@ export async function handleDominateWithMessageUrl(c: Context<{ Bindings: Bindin
       });
     }
 
-    const result = await analyzeCrimeCoefficient(c.env.AI, text);
+    const result = await analyzeCrimeCoefficient(c.env, text);
     const executionMode = getExecutionMode(result.crime_coefficient);
 
     const authorName: string = message?.author?.username
@@ -169,4 +169,3 @@ export async function handleDominateWithMessageUrl(c: Context<{ Bindings: Bindin
     });
   }
 }
-

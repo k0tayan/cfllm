@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "discord-interactions": "^3.4.0",
-    "hono": "^4.9.7"
+    "hono": "^4.9.7",
+    "@google/genai": "^0.3.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250913.0",
