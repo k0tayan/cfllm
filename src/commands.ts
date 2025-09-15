@@ -1,8 +1,11 @@
+import { Context } from 'hono';
+
 import { analyzeCrimeCoefficient } from './llm';
 import { ALLOWED_GUILD_IDs } from './config';
 import { getExecutionMode, parseDiscordMessageUrl } from './utils';
+import type { Bindings } from './bindings';
 
-export async function handleDominateCommand(c: any, interaction: any) {
+export async function handleDominateCommand(c: Context<{ Bindings: Bindings }>, interaction: any) {
   const followupUrl = `https://discord.com/api/v10/webhooks/${c.env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`;
   try {
     const userOpt = interaction.data.options?.find((opt: any) => opt.name === 'user');
@@ -70,7 +73,7 @@ export async function handleDominateCommand(c: any, interaction: any) {
   }
 }
 
-export async function handleDominateWithMessageUrl(c: any, interaction: any) {
+export async function handleDominateWithMessageUrl(c: Context<{ Bindings: Bindings }>, interaction: any) {
   const followupUrl = `https://discord.com/api/v10/webhooks/${c.env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`;
   try {
     const urlOpt = interaction.data.options?.find((opt: any) => opt.name === 'url');

@@ -1,3 +1,5 @@
+import { Ai } from "@cloudflare/workers-types/experimental";
+
 export async function executeLlmTask(ai: any, prompt: string): Promise<any> {
   if (!prompt) {
     throw new Error('Prompt is missing.');
@@ -19,7 +21,7 @@ export type CrimeResult = {
   reason: string;
 };
 
-export async function analyzeCrimeCoefficient(ai: any, userMessage: string): Promise<CrimeResult> {
+export async function analyzeCrimeCoefficient(ai: Ai, userMessage: string): Promise<CrimeResult> {
   if (!userMessage || typeof userMessage !== 'string') {
     return { crime_coefficient: 0, reason: '解析対象のメッセージが空でした。' };
   }
